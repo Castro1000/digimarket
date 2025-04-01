@@ -1,0 +1,93 @@
+.header {
+    background-color: #02254b;
+    color: white;
+    padding: 10px 0;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  }
+  
+  .header-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  
+  .grupo-esquerdo {
+    display: flex;
+    align-items: center;
+    gap: 30px;
+    margin-left: 90px; 
+  }
+  
+  .logo img {
+    height: 40px;
+    width: auto;
+  }
+  
+  .menu {
+    display: flex;
+    gap: 20px;
+    align-items: center;
+  }
+  
+  .menu a {
+    color: white;
+    text-decoration: none;
+    font-weight: 500;
+    font-size: 15px;
+    white-space: nowrap;
+  }
+  
+  .menu a:hover {
+    text-decoration: underline;
+  }
+  
+  .sair {
+    color: white;
+    text-decoration: none;
+    font-weight: 500;
+    font-size: 15px;
+    cursor: pointer;
+    white-space: nowrap;
+    margin-right: 110px;
+  }
+  
+  @media (max-width: 768px) {
+    .header-container {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 10px;
+      position: relative;
+    }
+  
+    .grupo-esquerdo {
+      margin-left: 10px;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 10px;
+    }
+  
+    .logo {
+      display: none; /* 👈 Remove a logo apenas no celular */
+    }
+  
+    .menu {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 10px;
+    }
+  
+    .sair {
+      margin: 0;
+      position: absolute;
+      top: 10px;
+      right: 20px; /* 👈 Fixa o botão “Sair” no topo direito */
+    }
+  
+    .menu a {
+      font-size: 14px;
+    }
+  }
+  
