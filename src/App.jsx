@@ -1,4 +1,4 @@
-import { Routes, Route, Link, useNavigate } from 'react-router-dom'
+import { Routes, Route, useNavigate, useLocation } from 'react-router-dom'
 import { useEffect, useState } from 'react'
 import Home from './pages/Home'
 import Login from './pages/Login'
@@ -14,6 +14,9 @@ import './App.css'
 function App() {
   const [usuario, setUsuario] = useState(null)
   const navigate = useNavigate()
+  const location = useLocation()
+
+  const rotasSemHeader = ['/login', '/cadastro']
 
   useEffect(() => {
     const usuarioSalvo = localStorage.getItem('usuarioLogado')
@@ -25,7 +28,7 @@ function App() {
     } else if (!rotaPublica) {
       navigate('/login')
     }
-  }, [window.location.pathname])
+  }, [location.pathname])
 
   const handleLogout = () => {
     localStorage.removeItem('usuarioLogado')
@@ -35,7 +38,7 @@ function App() {
 
   return (
     <>
-      {usuario && <Header />}
+      {!rotasSemHeader.includes(location.pathname) && usuario && <Header />}
 
       <Routes>
         <Route path="/" element={<Home />} />
