@@ -4,22 +4,18 @@ import './Home.css'
 export default function Home() {
   const [produtos, setProdutos] = useState([])
   const [compras, setCompras] = useState([])
-  const [baixandoId, setBaixandoId] = useState(null)
-  const [baixadoId, setBaixadoId] = useState(null)
   const [pagandoId, setPagandoId] = useState(null)
-  const [finalizadoId, setFinalizadoId] = useState(null)
   const [selecionandoForma, setSelecionandoForma] = useState(null)
   const [formaSelecionadaId, setFormaSelecionadaId] = useState(null)
   const [mostrarCartaoId, setMostrarCartaoId] = useState(null)
   const [dadosCartao, setDadosCartao] = useState({ nome: '', numero: '', validade: '', cvv: '' })
   const [boletoAguardandoIds, setBoletoAguardandoIds] = useState([])
+  const [modalSucesso, setModalSucesso] = useState(false)
 
   useEffect(() => {
     const produtosSalvos = JSON.parse(localStorage.getItem('produtos'))
-  
-    // Força o reset se tiver menos de 10 produtos
     if (!produtosSalvos || produtosSalvos.length < 10) {
-      const produtosPadrao = [ 
+      const produtosPadrao = [
         { id: 1, titulo: "Curso de JavaScript", descricao: "Aprenda JavaScript do zero.", preco: "59.90", vendedor: "Loja ProCursos" },
         { id: 2, titulo: "Template Portfólio", descricao: "Modelo para site pessoal.", preco: "29.90", vendedor: "WebDesigners Pro" },
         { id: 3, titulo: "E-book Marketing", descricao: "Dicas de marketing digital.", preco: "19.90", vendedor: "DigitalBooks" },
@@ -31,19 +27,18 @@ export default function Home() {
         { id: 9, titulo: "Kit Instagram", descricao: "Templates prontos para redes sociais.", preco: "22.90", vendedor: "SocialMedia Tools" },
         { id: 10, titulo: "Plugin WordPress", descricao: "Plugin de SEO para WP.", preco: "39.90", vendedor: "WPPro Plugins" }
       ]
-  
       localStorage.setItem('produtos', JSON.stringify(produtosPadrao))
       setProdutos(produtosPadrao)
     } else {
       setProdutos(produtosSalvos)
     }
-  
+
     const usuario = JSON.parse(localStorage.getItem('usuarioLogado'))
     const listaCompras = JSON.parse(localStorage.getItem('compras')) || []
     const minhasCompras = listaCompras.filter(c => c.email === usuario?.email)
     setCompras(minhasCompras)
   }, [])
-  
+
   const iniciarCompra = (produto) => {
     setSelecionandoForma(produto.id)
     setFormaSelecionadaId(null)
@@ -51,18 +46,16 @@ export default function Home() {
 
   const escolherFormaPagamento = (produto, forma) => {
     setFormaSelecionadaId(produto.id)
-    if (forma === 'Pix') setPagandoId(produto.id)
-    else if (forma === 'Boleto') {
+    if (forma === 'Pix') {
+      setPagandoId(produto.id)
+    } else if (forma === 'Boleto') {
       alert('Boleto enviado para seu e-mail cadastrado.')
       setBoletoAguardandoIds([...boletoAguardandoIds, produto.id])
-    } else if (forma === 'Cartão') setMostrarCartaoId(produto.id)
-  }
-
-  const confirmarPagamentoPix = (produto) => {
-    registrarCompra(produto, 'Pix')
-    setPagandoId(null)
-    setFinalizadoId(produto.id)
-    alert('Pagamento via Pix aprovado!')
+      registrarCompra(produto, 'Boleto')
+      setModalSucesso(true)
+    } else if (forma === 'Cartão') {
+      setMostrarCartaoId(produto.id)
+    }
   }
 
   const registrarCompra = (produto, forma) => {
@@ -75,48 +68,25 @@ export default function Home() {
       email: usuario.email,
       formaPagamento: forma
     }
-
     const atual = JSON.parse(localStorage.getItem('compras')) || []
     localStorage.setItem('compras', JSON.stringify([...atual, novaCompra]))
-    setCompras([...compras, novaCompra])
+  }
+
+  const confirmarPagamentoPix = (produto) => {
+    registrarCompra(produto, 'Pix')
+    setPagandoId(null)
+    setModalSucesso(true)
   }
 
   const finalizarCartao = (produto) => {
-    setMostrarCartaoId(null)
     registrarCompra(produto, 'Cartão')
-    setFinalizadoId(produto.id)
-    alert('Pagamento com cartão aprovado!')
+    setMostrarCartaoId(null)
+    setModalSucesso(true)
   }
 
-  const baixar = (produto) => {
-    const conteudo = `Resumo da Compra - DigiMarket\nProduto: ${produto.titulo}\nPreço: ${produto.preco}\nData: ${new Date().toLocaleDateString('pt-BR')}`
-    const blob = new Blob([conteudo], { type: 'text/plain' })
-    const url = URL.createObjectURL(blob)
-    const a = document.createElement('a')
-    a.href = url
-    a.download = `${produto.titulo.replace(/\s+/g, '_')}.txt`
-    document.body.appendChild(a)
-    a.click()
-    document.body.removeChild(a)
-    setBaixandoId(produto.id)
-
-    setTimeout(() => {
-      setBaixandoId(null)
-      setBaixadoId(produto.id)
-      URL.revokeObjectURL(url)
-
-      // 🔁 Recarrega a página após 2 segundos
-      setTimeout(() => {
-        window.location.reload()
-      }, 2000)
-
-    }, 3000)
+  const voltarPagina = () => {
+    window.location.reload()
   }
-
-  // ✅ Sempre permite comprar novamente
-  const jaComprou = () => false
-
-  const voltarPagina = () => window.location.reload()
 
   return (
     <div className="container">
@@ -149,14 +119,6 @@ export default function Home() {
               </div>
             )}
 
-            {boletoAguardandoIds.includes(p.id) && (
-              <div className="boleto-box">
-                <p>📩 Boleto enviado para o e-mail cadastrado.</p>
-                <p>⏳ Aguardando pagamento...</p>
-                <button onClick={voltarPagina}>🔙 Voltar</button>
-              </div>
-            )}
-
             {mostrarCartaoId === p.id && (
               <div className="modal-cartao">
                 <h3>Pagamento com Cartão</h3>
@@ -169,19 +131,22 @@ export default function Home() {
               </div>
             )}
 
-            {jaComprou(p.id) && finalizadoId === p.id && !baixadoId && !baixandoId && (
-              <button className="btn-baixar" onClick={() => baixar(p)}>Baixar Arquivo</button>
-            )}
-
-            {baixandoId === p.id && <p>📦 Baixando arquivo...</p>}
-            {baixadoId === p.id && <p>✅ Arquivo baixado com sucesso!</p>}
-
-            {!formaSelecionadaId && !pagandoId && !boletoAguardandoIds.includes(p.id) && (
+            {!formaSelecionadaId && (
               <button className="btn-comprar" onClick={() => iniciarCompra(p)}>🛒 Comprar</button>
             )}
           </div>
         ))}
       </div>
+
+      {modalSucesso && (
+        <div className="modal-overlay">
+          <div className="modal-box animate">
+            <h3>🎉 Parabéns pela compra!</h3>
+            <p>Assim que confirmado o pagamento,<br />o arquivo será enviado para seu e-mail cadastrado.</p>
+            <button onClick={voltarPagina}>OK</button>
+          </div>
+        </div>
+      )}
     </div>
   )
 }
