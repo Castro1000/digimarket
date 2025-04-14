@@ -1,4 +1,3 @@
-// Página Home com visual tipo vitrine (estilo Mercado Livre)
 import { useEffect, useState } from 'react'
 import './Home.css'
 
@@ -16,8 +15,26 @@ export default function Home() {
   const [boletoAguardandoIds, setBoletoAguardandoIds] = useState([])
 
   useEffect(() => {
-    const lista = JSON.parse(localStorage.getItem('produtos')) || []
-    setProdutos(lista)
+    const produtosSalvos = JSON.parse(localStorage.getItem('produtos'))
+    if (!produtosSalvos || produtosSalvos.length === 0) {
+      const produtosPadrao = [
+        { id: 1, titulo: "Curso de JavaScript", descricao: "Aprenda JavaScript do zero.", preco: "59.90", vendedor: "Loja ProCursos" },
+        { id: 2, titulo: "Template Portfólio", descricao: "Modelo para site pessoal.", preco: "29.90", vendedor: "WebDesigners Pro" },
+        { id: 3, titulo: "E-book Marketing", descricao: "Dicas de marketing digital.", preco: "19.90", vendedor: "DigitalBooks" },
+        { id: 4, titulo: "Curso de Python", descricao: "Aprenda Python na prática.", preco: "69.90", vendedor: "Loja ProCursos" },
+        { id: 5, titulo: "Apostila ENEM 2024", descricao: "Material completo para o ENEM.", preco: "14.90", vendedor: "Educa+" },
+        { id: 6, titulo: "Ícones SVG", descricao: "Pacote com 500 ícones vetoriais.", preco: "9.90", vendedor: "DesignAssets" },
+        { id: 7, titulo: "Modelo Currículo", descricao: "Currículo moderno e pronto.", preco: "4.90", vendedor: "Documentos Express" },
+        { id: 8, titulo: "Curso de Excel", descricao: "Domine o Excel básico.", preco: "34.90", vendedor: "Planilhas Pro" },
+        { id: 9, titulo: "Kit Instagram", descricao: "Templates prontos para redes sociais.", preco: "22.90", vendedor: "SocialMedia Tools" },
+        { id: 10, titulo: "Plugin WordPress", descricao: "Plugin de SEO para WP.", preco: "39.90", vendedor: "WPPro Plugins" }
+      ]
+
+      localStorage.setItem('produtos', JSON.stringify(produtosPadrao))
+      setProdutos(produtosPadrao)
+    } else {
+      setProdutos(produtosSalvos)
+    }
 
     const usuario = JSON.parse(localStorage.getItem('usuarioLogado'))
     const listaCompras = JSON.parse(localStorage.getItem('compras')) || []
@@ -32,15 +49,11 @@ export default function Home() {
 
   const escolherFormaPagamento = (produto, forma) => {
     setFormaSelecionadaId(produto.id)
-
-    if (forma === 'Pix') {
-      setPagandoId(produto.id)
-    } else if (forma === 'Boleto') {
+    if (forma === 'Pix') setPagandoId(produto.id)
+    else if (forma === 'Boleto') {
       alert('Boleto enviado para seu e-mail cadastrado.')
       setBoletoAguardandoIds([...boletoAguardandoIds, produto.id])
-    } else if (forma === 'Cartão') {
-      setMostrarCartaoId(produto.id)
-    }
+    } else if (forma === 'Cartão') setMostrarCartaoId(produto.id)
   }
 
   const confirmarPagamentoPix = (produto) => {
@@ -84,18 +97,24 @@ export default function Home() {
     a.click()
     document.body.removeChild(a)
     setBaixandoId(produto.id)
+
     setTimeout(() => {
       setBaixandoId(null)
       setBaixadoId(produto.id)
       URL.revokeObjectURL(url)
+
+      // 🔁 Recarrega a página após 2 segundos
+      setTimeout(() => {
+        window.location.reload()
+      }, 2000)
+
     }, 3000)
   }
 
-  const jaComprou = (produtoId) => compras.some(c => c.id === produtoId)
+  // ✅ Sempre permite comprar novamente
+  const jaComprou = () => false
 
-  const voltarPagina = () => {
-    window.location.reload()
-  }
+  const voltarPagina = () => window.location.reload()
 
   return (
     <div className="container">
@@ -128,7 +147,7 @@ export default function Home() {
               </div>
             )}
 
-            {boletoAguardandoIds.includes(p.id) && !jaComprou(p.id) && (
+            {boletoAguardandoIds.includes(p.id) && (
               <div className="boleto-box">
                 <p>📩 Boleto enviado para o e-mail cadastrado.</p>
                 <p>⏳ Aguardando pagamento...</p>
@@ -155,7 +174,7 @@ export default function Home() {
             {baixandoId === p.id && <p>📦 Baixando arquivo...</p>}
             {baixadoId === p.id && <p>✅ Arquivo baixado com sucesso!</p>}
 
-            {!jaComprou(p.id) && !formaSelecionadaId && !pagandoId && !boletoAguardandoIds.includes(p.id) && (
+            {!formaSelecionadaId && !pagandoId && !boletoAguardandoIds.includes(p.id) && (
               <button className="btn-comprar" onClick={() => iniciarCompra(p)}>🛒 Comprar</button>
             )}
           </div>
