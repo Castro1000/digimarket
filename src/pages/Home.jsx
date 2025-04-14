@@ -16,8 +16,10 @@ export default function Home() {
 
   useEffect(() => {
     const produtosSalvos = JSON.parse(localStorage.getItem('produtos'))
-    if (!produtosSalvos || produtosSalvos.length === 0) {
-      const produtosPadrao = [
+  
+    // Força o reset se tiver menos de 10 produtos
+    if (!produtosSalvos || produtosSalvos.length < 10) {
+      const produtosPadrao = [ 
         { id: 1, titulo: "Curso de JavaScript", descricao: "Aprenda JavaScript do zero.", preco: "59.90", vendedor: "Loja ProCursos" },
         { id: 2, titulo: "Template Portfólio", descricao: "Modelo para site pessoal.", preco: "29.90", vendedor: "WebDesigners Pro" },
         { id: 3, titulo: "E-book Marketing", descricao: "Dicas de marketing digital.", preco: "19.90", vendedor: "DigitalBooks" },
@@ -29,19 +31,19 @@ export default function Home() {
         { id: 9, titulo: "Kit Instagram", descricao: "Templates prontos para redes sociais.", preco: "22.90", vendedor: "SocialMedia Tools" },
         { id: 10, titulo: "Plugin WordPress", descricao: "Plugin de SEO para WP.", preco: "39.90", vendedor: "WPPro Plugins" }
       ]
-
+  
       localStorage.setItem('produtos', JSON.stringify(produtosPadrao))
       setProdutos(produtosPadrao)
     } else {
       setProdutos(produtosSalvos)
     }
-
+  
     const usuario = JSON.parse(localStorage.getItem('usuarioLogado'))
     const listaCompras = JSON.parse(localStorage.getItem('compras')) || []
     const minhasCompras = listaCompras.filter(c => c.email === usuario?.email)
     setCompras(minhasCompras)
   }, [])
-
+  
   const iniciarCompra = (produto) => {
     setSelecionandoForma(produto.id)
     setFormaSelecionadaId(null)
