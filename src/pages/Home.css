@@ -92,14 +92,15 @@ button:hover {
 .filtros {
   display: flex;
   flex-direction: column;
-  gap: 10px;
-  margin-bottom: 25px;
+  gap: 2px;
+  margin-bottom: 10px;
   align-items: center;
+  margin-top: -15px;
 }
 
 .filtros input[type="text"] {
   width: 90%;
-  max-width: 300px;
+  max-width: 270px;
   padding: 8px 12px;
   font-size: 15px;
   border: 1px solid #ccc;

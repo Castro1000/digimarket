@@ -4,9 +4,7 @@ import './Home.css'
 export default function Home() {
   const [produtos, setProdutos] = useState([])
   const [compras, setCompras] = useState([])
-  const [baixandoId, setBaixandoId] = useState(null)
   const [pagandoId, setPagandoId] = useState(null)
-  const [finalizadoId, setFinalizadoId] = useState(null)
   const [selecionandoForma, setSelecionandoForma] = useState(null)
   const [formaSelecionadaId, setFormaSelecionadaId] = useState(null)
   const [mostrarCartaoId, setMostrarCartaoId] = useState(null)
@@ -47,7 +45,6 @@ export default function Home() {
   const iniciarCompra = (produto) => {
     setSelecionandoForma(produto.id)
     setFormaSelecionadaId(null)
-    setFinalizadoId(null)
   }
 
   const escolherFormaPagamento = (produto, forma) => {
@@ -100,7 +97,7 @@ export default function Home() {
 
   return (
     <div className="container">
-      <h2 className="titulo">🛒 Produtos em Destaque</h2>
+      <h2 className="titulo">🛒 PRODUTOS</h2>
 
       <div className="filtros">
         <input type="text" placeholder="🔍 Buscar por título" value={busca} onChange={e => setBusca(e.target.value)} />
