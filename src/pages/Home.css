@@ -20,7 +20,7 @@
   border: 1px solid #ddd;
   padding: 15px;
   border-radius: 10px;
-  box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
   transition: transform 0.2s ease;
 }
 
@@ -88,11 +88,11 @@ button:hover {
   border-radius: 4px;
 }
 
-
+/* Filtros */
 .filtros {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 10px;
   margin-bottom: 25px;
   align-items: center;
 }
@@ -108,62 +108,79 @@ button:hover {
 
 .filtros-preco {
   display: flex;
-  gap: 20px;
+  gap: 10px;
   justify-content: center;
   flex-wrap: wrap;
 }
 
 .filtros-preco input {
-  width: 140px;
+  width: 130px;
   padding: 8px 10px;
   font-size: 14px;
   border: 1px solid #ccc;
   border-radius: 6px;
 }
 
-
+/* MODAL centralizado e animado */
 .modal-overlay {
   position: fixed;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
-  background: rgba(0, 0, 0, 0.6);
+  background: rgba(0, 0, 0, 0.5);
   z-index: 9999;
   display: flex;
   justify-content: center;
   align-items: center;
 }
 
-.modal-box {
+.modal-content {
   background: white;
   padding: 30px;
-  border-radius: 15px;
+  border-radius: 12px;
   text-align: center;
-  animation: fadeIn 0.4s ease-in-out;
+  animation: animate-pop 0.4s ease-in-out;
+  max-width: 90%;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
 }
 
-.modal-box h3 {
+.modal-content h3 {
+  font-size: 22px;
+  color: #2e7d32;
   margin-bottom: 10px;
-  color: #333;
 }
 
-.modal-box p {
+.modal-content p {
   font-size: 16px;
+  color: #444;
   margin-bottom: 15px;
 }
 
-.modal-box button {
-  padding: 10px 20px;
-  background: #1d9c34;
+.modal-content button {
+  background-color: #1d9c34;
   color: white;
-  border: none;
-  border-radius: 6px;
-  cursor: pointer;
+  padding: 10px 25px;
+  font-size: 15px;
   font-weight: bold;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.2s;
 }
 
-@keyframes fadeIn {
-  from { transform: scale(0.8); opacity: 0; }
-  to { transform: scale(1); opacity: 1; }
+.modal-content button:hover {
+  background-color: #147324;
+}
+
+/* Animação */
+@keyframes animate-pop {
+  0% {
+    transform: scale(0.85);
+    opacity: 0;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
 }
