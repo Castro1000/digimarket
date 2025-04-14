@@ -4,13 +4,18 @@ import './Home.css'
 export default function Home() {
   const [produtos, setProdutos] = useState([])
   const [compras, setCompras] = useState([])
+  const [baixandoId, setBaixandoId] = useState(null)
+  const [baixadoId, setBaixadoId] = useState(null)
   const [pagandoId, setPagandoId] = useState(null)
+  const [finalizadoId, setFinalizadoId] = useState(null)
   const [selecionandoForma, setSelecionandoForma] = useState(null)
   const [formaSelecionadaId, setFormaSelecionadaId] = useState(null)
   const [mostrarCartaoId, setMostrarCartaoId] = useState(null)
   const [dadosCartao, setDadosCartao] = useState({ nome: '', numero: '', validade: '', cvv: '' })
   const [boletoAguardandoIds, setBoletoAguardandoIds] = useState([])
-  const [modalSucesso, setModalSucesso] = useState(false)
+  const [busca, setBusca] = useState('')
+  const [precoMin, setPrecoMin] = useState('')
+  const [precoMax, setPrecoMax] = useState('')
 
   useEffect(() => {
     const produtosSalvos = JSON.parse(localStorage.getItem('produtos'))
@@ -30,7 +35,7 @@ export default function Home() {
       localStorage.setItem('produtos', JSON.stringify(produtosPadrao))
       setProdutos(produtosPadrao)
     } else {
-      setProdutos(produtosSalvos)
+      setProdutos(produtosSalvos.reverse())
     }
 
     const usuario = JSON.parse(localStorage.getItem('usuarioLogado'))
@@ -46,16 +51,18 @@ export default function Home() {
 
   const escolherFormaPagamento = (produto, forma) => {
     setFormaSelecionadaId(produto.id)
-    if (forma === 'Pix') {
-      setPagandoId(produto.id)
-    } else if (forma === 'Boleto') {
+    if (forma === 'Pix') setPagandoId(produto.id)
+    else if (forma === 'Boleto') {
       alert('Boleto enviado para seu e-mail cadastrado.')
       setBoletoAguardandoIds([...boletoAguardandoIds, produto.id])
-      registrarCompra(produto, 'Boleto')
-      setModalSucesso(true)
-    } else if (forma === 'Cartão') {
-      setMostrarCartaoId(produto.id)
-    }
+      setFinalizadoId(produto.id)
+    } else if (forma === 'Cartão') setMostrarCartaoId(produto.id)
+  }
+
+  const confirmarPagamentoPix = (produto) => {
+    registrarCompra(produto, 'Pix')
+    setPagandoId(null)
+    setFinalizadoId(produto.id)
   }
 
   const registrarCompra = (produto, forma) => {
@@ -68,85 +75,66 @@ export default function Home() {
       email: usuario.email,
       formaPagamento: forma
     }
+
     const atual = JSON.parse(localStorage.getItem('compras')) || []
     localStorage.setItem('compras', JSON.stringify([...atual, novaCompra]))
-  }
-
-  const confirmarPagamentoPix = (produto) => {
-    registrarCompra(produto, 'Pix')
-    setPagandoId(null)
-    setModalSucesso(true)
+    setCompras([...compras, novaCompra])
   }
 
   const finalizarCartao = (produto) => {
-    registrarCompra(produto, 'Cartão')
     setMostrarCartaoId(null)
-    setModalSucesso(true)
+    registrarCompra(produto, 'Cartão')
+    setFinalizadoId(produto.id)
   }
 
-  const voltarPagina = () => {
-    window.location.reload()
-  }
+  const voltarPagina = () => window.location.reload()
+
+  const produtosFiltrados = produtos.filter((p) => {
+    const preco = parseFloat(p.preco)
+    const tituloMatch = p.titulo.toLowerCase().includes(busca.toLowerCase())
+    const precoMinOk = !precoMin || preco >= parseFloat(precoMin)
+    const precoMaxOk = !precoMax || preco <= parseFloat(precoMax)
+    return tituloMatch && precoMinOk && precoMaxOk
+  })
 
   return (
     <div className="container">
       <h2 className="titulo">🛒 Produtos em Destaque</h2>
+
+      <div className="filtros">
+        <input
+          type="text"
+          placeholder="🔍 Buscar por título"
+          value={busca}
+          onChange={e => setBusca(e.target.value)}
+        />
+        <div className="filtros-preco">
+          <input
+            type="number"
+            placeholder="Preço Mínimo"
+            value={precoMin}
+            onChange={e => setPrecoMin(e.target.value)}
+          />
+          <input
+            type="number"
+            placeholder="Preço Máximo"
+            value={precoMax}
+            onChange={e => setPrecoMax(e.target.value)}
+          />
+        </div>
+      </div>
+
       <div className="grade-produtos">
-        {produtos.map((p) => (
+        {produtosFiltrados.map((p) => (
           <div key={p.id} className="produto-card">
             <h3>{p.titulo}</h3>
             <p className="descricao">{p.descricao}</p>
             <p className="preco">R$ {p.preco}</p>
             <p className="loja">Loja: {p.vendedor}</p>
-
-            {selecionandoForma === p.id && !formaSelecionadaId && (
-              <div className="pagamento">
-                <p><strong>Forma de pagamento:</strong></p>
-                <button onClick={() => escolherFormaPagamento(p, 'Cartão')}>💳 Cartão</button>
-                <button onClick={() => escolherFormaPagamento(p, 'Pix')}>📱 Pix</button>
-                <button onClick={() => escolherFormaPagamento(p, 'Boleto')}>📄 Boleto</button>
-                <button onClick={voltarPagina}>🔙 Voltar</button>
-              </div>
-            )}
-
-            {formaSelecionadaId === p.id && pagandoId === p.id && (
-              <div className="pix-box">
-                <p><strong>Escaneie o QR Code:</strong></p>
-                <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=PIX1234567890" alt="QR Code Pix" /><br />
-                <p>Chave Pix: PIX1234567890</p>
-                <button onClick={() => confirmarPagamentoPix(p)}>✅ Confirmar pagamento</button>
-                <button onClick={voltarPagina}>🔙 Voltar</button>
-              </div>
-            )}
-
-            {mostrarCartaoId === p.id && (
-              <div className="modal-cartao">
-                <h3>Pagamento com Cartão</h3>
-                <input placeholder="Nome no Cartão" value={dadosCartao.nome} onChange={e => setDadosCartao({ ...dadosCartao, nome: e.target.value })} />
-                <input placeholder="Número" value={dadosCartao.numero} onChange={e => setDadosCartao({ ...dadosCartao, numero: e.target.value })} />
-                <input placeholder="Validade (MM/AA)" value={dadosCartao.validade} onChange={e => setDadosCartao({ ...dadosCartao, validade: e.target.value })} />
-                <input placeholder="CVV" value={dadosCartao.cvv} onChange={e => setDadosCartao({ ...dadosCartao, cvv: e.target.value })} />
-                <button onClick={() => finalizarCartao(p)}>Finalizar Pagamento</button>
-                <button onClick={voltarPagina}>🔙 Voltar</button>
-              </div>
-            )}
-
-            {!formaSelecionadaId && (
-              <button className="btn-comprar" onClick={() => iniciarCompra(p)}>🛒 Comprar</button>
-            )}
+            <button className="btn-comprar" onClick={() => iniciarCompra(p)}>🛒 Comprar</button>
           </div>
         ))}
       </div>
-
-      {modalSucesso && (
-        <div className="modal-overlay">
-          <div className="modal-box animate">
-            <h3>🎉 Parabéns pela compra!</h3>
-            <p>Assim que confirmado o pagamento,<br />o arquivo será enviado para seu e-mail cadastrado.</p>
-            <button onClick={voltarPagina}>OK</button>
-          </div>
-        </div>
-      )}
     </div>
   )
 }

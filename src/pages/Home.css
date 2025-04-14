@@ -89,8 +89,37 @@ button:hover {
 }
 
 
+.filtros {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 25px;
+  align-items: center;
+}
 
+.filtros input[type="text"] {
+  width: 90%;
+  max-width: 300px;
+  padding: 8px 12px;
+  font-size: 15px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+}
 
+.filtros-preco {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.filtros-preco input {
+  width: 130px;
+  padding: 8px 10px;
+  font-size: 14px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+}
 
 
 .modal-overlay {
