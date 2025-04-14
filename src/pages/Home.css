@@ -108,13 +108,13 @@ button:hover {
 
 .filtros-preco {
   display: flex;
-  gap: 10px;
+  gap: 20px;
   justify-content: center;
   flex-wrap: wrap;
 }
 
 .filtros-preco input {
-  width: 130px;
+  width: 140px;
   padding: 8px 10px;
   font-size: 14px;
   border: 1px solid #ccc;
